@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Settings — SmartRecipe AI{% endblock %}
+
+{% block content %}
+<section class="auth-wrap">
+  <div class="auth-card">
+    <h1>⚙️ Settings</h1>
+    <p class="auth-sub">Manage your SmartRecipe AI preferences.</p>
+
+    <div class="settings-list">
+      <div class="settings-row">
+        <div>
+          <h3>👤 Account</h3>
+          <p>Update your name and email from your profile page.</p>
+        </div>
+        <a href="{{ url_for('profile') }}" class="btn-outline">Manage</a>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <h3>📜 Recipe History</h3>
+          <p>View or clear your generated recipe history.</p>
+        </div>
+        <a href="{{ url_for('history') }}" class="btn-outline">View</a>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <h3>❤️ Favorites</h3>
+          <p>Review the recipes you've marked as favorites.</p>
+        </div>
+        <a href="{{ url_for('favorites') }}" class="btn-outline">View</a>
+      </div>
+
+      <div class="settings-row">
+        <div>
+          <h3>🚪 Sign Out</h3>
+          <p>End your current SmartRecipe AI session securely.</p>
+        </div>
+        <a href="{{ url_for('logout') }}" class="btn-outline btn-danger">Logout</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

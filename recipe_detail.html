@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{{ recipe.dish_name }} — SmartRecipe AI{% endblock %}
+
+{% block content %}
+{% set unresolved = recipe.missing_ingredients | rejectattr('name', 'in', recipe.substitutions | map(attribute='original') | list) | list %}
+
+<section class="result-wrap">
+
+  <div class="result-header card">
+    <h1>🍗 {{ recipe.dish_name }}</h1>
+    <div class="overview-pills">
+      <span class="pill">⏱️ Prep: {{ recipe.recipe.preparation_time }}</span>
+      <span class="pill">🔥 Cook: {{ recipe.recipe.cooking_time }}</span>
+      <span class="pill">🍽️ Servings: {{ recipe.recipe.servings }}</span>
+      {% if row %}<span class="pill">📅 {{ row.created_at }}</span>{% endif %}
+    </div>
+  </div>
+
+  <!-- Tabbed "pages" -->
+  <div class="tabs-nav" role="tablist">
+    <button type="button" class="tab-btn active" data-tab="tab-overview">🥗 Ingredients</button>
+    <button type="button" class="tab-btn" data-tab="tab-substitutions">🔄 Substitutions{% if recipe.substitutions %} <span class="tab-count">{{ recipe.substitutions|length }}</span>{% endif %}</button>
+    <button type="button" class="tab-btn" data-tab="tab-steps">📋 Steps</button>
+    <button type="button" class="tab-btn" data-tab="tab-analysis">🤖 AI Analysis</button>
+  </div>
+
+  <!-- PAGE 1: Ingredients Overview -->
+  <div class="tab-page active" id="tab-overview">
+    <div class="card">
+      <h2>🥗 Ingredients Used</h2>
+      <div class="ingredient-tag-list">
+        {% for ing in recipe.ingredients_used %}
+          <span class="ingredient-tag">🧄 {{ ing.name }}{% if ing.quantity %} — {{ ing.quantity }}{% endif %}</span>
+        {% else %}
+          <p class="muted">No ingredient data available.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if unresolved %}
+    <div class="card warning-card">
+      <h2>⚠️ Missing Ingredients</h2>
+      {% for m in unresolved %}
+        <p>⚠ No suitable replacement found for <strong>{{ m.name }}</strong>{% if m.quantity %} ({{ m.quantity }}){% endif %}.</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- PAGE 2: Substitutions -->
+  <div class="tab-page" id="tab-substitutions">
+    <div class="card">
+      <h2>🔄 Smart Ingredient Substitutions</h2>
+      {% if recipe.substitutions %}
+        <div class="sub-grid">
+          {% for sub in recipe.substitutions %}
+            <div class="sub-card">
+              <div class="sub-title">{{ sub.original }} ➜ {{ sub.replacement }}</div>
+              <div class="sub-why"><strong>Why?</strong> {{ sub.reason }}</div>
+              {% if sub.quantity %}<div class="sub-qty">📏 Quantity: {{ sub.quantity }}</div>{% endif %}
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p class="muted">✅ No substitutions were needed — you had everything for this dish!</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- PAGE 3: Step-wise Process -->
+  <div class="tab-page" id="tab-steps">
+    <div class="card">
+      <h2>📋 Step-by-Step Process</h2>
+      <ol class="step-list">
+        {% for step in recipe.recipe.steps %}
+          <li><span class="step-num">{{ loop.index }}</span> {{ step }}</li>
+        {% else %}
+          <p class="muted">No steps were returned for this recipe.</p>
+        {% endfor %}
+      </ol>
+    </div>
+  </div>
+
+  <!-- PAGE 4: AI Analysis -->
+  <div class="tab-page" id="tab-analysis">
+    <div class="card note-card">
+      <h2>🤖 AI Cooking Analysis</h2>
+      {% if recipe.ai_note %}
+        <p>{{ recipe.ai_note }}</p>
+      {% else %}
+        <p>No additional AI notes for this recipe.</p>
+      {% endif %}
+    </div>
+    <div class="card analysis-summary">
+      <h2>📊 Summary</h2>
+      <div class="analysis-grid">
+        <div class="analysis-stat">
+          <span class="analysis-num">{{ recipe.ingredients_used|length }}</span>
+          <span class="analysis-label">🧄 Ingredients Used</span>
+        </div>
+        <div class="analysis-stat">
+          <span class="analysis-num">{{ recipe.substitutions|length }}</span>
+          <span class="analysis-label">🔄 Substitutions Made</span>
+        </div>
+        <div class="analysis-stat">
+          <span class="analysis-num">{{ unresolved|length }}</span>
+          <span class="analysis-label">⚠️ Unresolved Ingredients</span>
+        </div>
+        <div class="analysis-stat">
+          <span class="analysis-num">{{ recipe.recipe.steps|length }}</span>
+          <span class="analysis-label">📋 Cooking Steps</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="result-actions">
+    {% if row %}
+      <form action="{{ url_for('toggle_favorite', recipe_id=row.id) }}" method="POST" class="inline-form">
+        <button type="submit" class="btn-solid">
+          {% if is_favorite %}💔 Remove from Favorites{% else %}❤️ Add to Favorites{% endif %}
+        </button>
+      </form>
+      <form action="{{ url_for('delete_recipe', recipe_id=row.id) }}" method="POST" class="inline-form"
+            onsubmit="return confirm('Delete this recipe? 🗑️');">
+        <button type="submit" class="btn-outline btn-danger">🗑️ Delete</button>
+      </form>
+    {% endif %}
+    <a href="{{ url_for('generate') }}" class="btn-outline">🔁 Generate Another Recipe</a>
+    <a href="{{ url_for('dashboard') }}" class="btn-outline">🏠 Back to Dashboard</a>
+  </div>
+
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  initRecipeTabs();
+</script>
+{% endblock %}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Page Not Found — SmartRecipe AI</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+<main class="page-wrap">
+  <section class="error-wrap">
+    <div class="card error-card">
+      <div class="error-emoji">🍽️❓</div>
+      <h1>404 — Recipe Not Found</h1>
+      <p>Looks like this page wandered off the menu.</p>
+      <a href="{{ url_for('home') }}" class="btn-solid">🏠 Back to Home</a>
+    </div>
+  </section>
+</main>
+</body>
+</html>

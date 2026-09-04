@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block title %}SmartRecipe AI — GenAI Powered Cooking Assistant{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+  <!-- Wavy top decoration -->
+  <div class="hero-bg-blobs">
+    <div class="blob-1"></div>
+    <div class="blob-2"></div>
+  </div>
+
+  <div class="hero-container">
+    <div class="hero-left">
+      <div class="badge-genai">
+        <svg class="badge-svg" width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="8" width="18" height="12" rx="4" fill="#9B78E8"/>
+          <circle cx="8" cy="13" r="1.5" fill="white"/>
+          <circle cx="16" cy="13" r="1.5" fill="white"/>
+          <path d="M10 17 Q12 18.5 14 17" stroke="white" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+          <circle cx="12" cy="4" r="2" fill="#9B78E8"/>
+          <line x1="12" y1="6" x2="12" y2="8" stroke="#9B78E8" stroke-width="1.5"/>
+        </svg>
+        <span>GenAI Powered Cooking Assistant</span>
+      </div>
+
+      <h1 class="hero-heading">
+        Create Delicious Recipes<br>
+        With What You<br>
+        <span class="heading-highlight">Already Have<span class="underline-scribble"></span></span>
+      </h1>
+
+      <p class="hero-description">
+        Tell us what you want to eat and the ingredients in your kitchen.
+        Our AI creates a personalized recipe and intelligently suggests
+        ingredient replacements when needed.
+      </p>
+
+      <div class="hero-cta-buttons">
+        {% if nav_user %}
+          <a href="{{ url_for('generate') }}" class="btn-cta-primary">🪄 Get Started</a>
+          <a href="{{ url_for('dashboard') }}" class="btn-cta-secondary">🍲 Go to Dashboard</a>
+        {% else %}
+          <a href="{{ url_for('signup') }}" class="btn-cta-primary">🪄 Get Started</a>
+          <a href="{{ url_for('signin') }}" class="btn-cta-secondary">
+            <span class="btn-secondary-icon">🍲</span> Generate Recipe
+          </a>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="hero-right">
+      <img class="hero-pot-img" src="{{ url_for('static', filename='cook_pot.jpg') }}" alt="SmartRecipe AI Cooking Pot">
+    </div>
+  </div>
+
+  <!-- Soft Wavy Transition -->
+  <div class="hero-wavy-transition">
+    <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+      <path d="M0,45 C280,100 540,110 820,55 C1100,0 1280,10 1440,30 L1440,120 L0,120 Z" fill="#FFFDFD"></path>
+    </svg>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="landing-features">
+  <div class="features-header-wrap">
+    <span class="spark-left">✨</span>
+    <h2 class="features-main-title">Why cooks love SmartRecipe AI 💗</h2>
+    <span class="spark-right">✨</span>
+  </div>
+
+  <div class="features-card-grid">
+    <!-- Card 1 -->
+    <div class="feature-landing-card fl-lavender">
+      <div class="feature-card-art">
+        <svg width="100" height="90" viewBox="0 0 100 90" fill="none">
+          <!-- Salad bowl -->
+          <circle cx="50" cy="55" r="30" fill="#E8D5F5" opacity="0.4"/>
+          <ellipse cx="50" cy="52" rx="26" ry="18" fill="#FFFFFF" stroke="#C9A0E8" stroke-width="1.8"/>
+          <!-- Veggies inside -->
+          <circle cx="42" cy="48" r="8" fill="#FFC5D9"/>
+          <circle cx="58" cy="46" r="7" fill="#C7E8D5"/>
+          <rect x="46" y="42" width="10" height="14" rx="2" fill="#FFD0B5" transform="rotate(15 46 42)"/>
+          <ellipse cx="50" cy="54" rx="20" ry="10" fill="#FFF2F6" opacity="0.6"/>
+          <!-- Floating Heart -->
+          <path d="M82 25 C80 20 73 18 73 23 C73 28 82 35 82 35 C82 35 91 28 91 23 C91 18 84 20 82 25Z" fill="#FFB0C8"/>
+        </svg>
+      </div>
+      <h3 class="feature-card-title">Personalized Recipes</h3>
+      <p class="feature-card-text">
+        Get recipes tailored to your taste, preferences, and available ingredients.
+      </p>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="feature-landing-card fl-mint">
+      <div class="feature-card-art">
+        <svg width="100" height="90" viewBox="0 0 100 90" fill="none">
+          <!-- Refrigerator -->
+          <rect x="36" y="15" width="28" height="58" rx="6" fill="#E0F5E8" stroke="#A8D8B8" stroke-width="2"/>
+          <line x1="36" y1="38" x2="64" y2="38" stroke="#A8D8B8" stroke-width="1.5"/>
+          <!-- Handles -->
+          <rect x="32" y="24" width="2" height="10" rx="1" fill="#8CC0A0"/>
+          <rect x="32" y="44" width="2" height="12" rx="1" fill="#8CC0A0"/>
+          <!-- Cycle icon -->
+          <path d="M72 40 A10 10 0 1 1 72 56" stroke="#8CC0A0" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M72 50 L75 56 L68 56 Z" fill="#8CC0A0"/>
+          <path d="M28 50 A10 10 0 1 1 28 34" stroke="#8CC0A0" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M28 40 L25 34 L32 34 Z" fill="#8CC0A0"/>
+        </svg>
+      </div>
+      <h3 class="feature-card-title">Smart Ingredient<br>Substitution</h3>
+      <p class="feature-card-text">
+        AI suggests the best replacements when you’re missing ingredients.
+      </p>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="feature-landing-card fl-pink">
+      <div class="feature-card-art">
+        <svg width="100" height="90" viewBox="0 0 100 90" fill="none">
+          <!-- Robot face -->
+          <rect x="28" y="24" width="44" height="34" rx="12" fill="#FFF2F6" stroke="#FFC5D9" stroke-width="2"/>
+          <circle cx="42" cy="40" r="3" fill="#30314F"/>
+          <circle cx="58" cy="40" r="3" fill="#30314F"/>
+          <path d="M46 48 Q50 51 54 48" stroke="#30314F" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+          <rect x="42" y="14" width="16" height="6" rx="3" fill="#FFC5D9"/>
+          <!-- Antennas -->
+          <line x1="50" y1="20" x2="50" y2="24" stroke="#FFC5D9" stroke-width="2"/>
+          <circle cx="50" cy="12" r="3" fill="#FFB0C8"/>
+          <!-- Headphones -->
+          <rect x="22" y="32" width="6" height="18" rx="3" fill="#FFC5D9"/>
+          <rect x="72" y="32" width="6" height="18" rx="3" fill="#FFC5D9"/>
+        </svg>
+      </div>
+      <h3 class="feature-card-title">AI-Powered<br>Recommendations</h3>
+      <p class="feature-card-text">
+        Discover new ideas, cooking tips, and pairings powered by AI.
+      </p>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="feature-landing-card fl-peach">
+      <div class="feature-card-art">
+        <svg width="100" height="90" viewBox="0 0 100 90" fill="none">
+          <!-- Open book -->
+          <path d="M20 54 C35 54 48 50 48 24 L20 24 Z" fill="#FFF5ED" stroke="#FFD0B5" stroke-width="2"/>
+          <path d="M76 54 C61 54 48 50 48 24 L76 24 Z" fill="#FFF5ED" stroke="#FFD0B5" stroke-width="2"/>
+          <path d="M20 56 C35 56 48 52 48 26" stroke="#FFD0B5" stroke-width="2" fill="none"/>
+          <path d="M76 56 C61 56 48 52 48 26" stroke="#FFD0B5" stroke-width="2" fill="none"/>
+          <!-- Glowing light bulb -->
+          <circle cx="48" cy="20" r="8" fill="#FFF9E0" stroke="#FFB400" stroke-width="1.8"/>
+          <line x1="48" y1="28" x2="48" y2="31" stroke="#FFB400" stroke-width="1.8"/>
+          <rect x="44" y="27" width="8" height="2" rx="1" fill="#FFD9C5"/>
+          <path d="M48 6 L48 10" stroke="#FFB400" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M38 12 L41 14" stroke="#FFB400" stroke-width="1.5" stroke-linecap="round"/>
+          <path d="M58 12 L55 14" stroke="#FFB400" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h3 class="feature-card-title">Explainable Suggestions</h3>
+      <p class="feature-card-text">
+        Understand why suggestions are made with clear and simple explanations.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="landing-about">
+  <div class="about-card">
+    <div class="about-badge">ℹ️ About SmartRecipe AI</div>
+    <h2>Your friendly helper in the kitchen</h2>
+    <p>
+      SmartRecipe AI is a full-stack GenAI application that pairs your available ingredients with your cravings.
+      It explains every substitution by ingredient function — acidity, fat, moisture, or flavor — so you always
+      know exactly why a swap works, and how it might change your dish. 🥗
+    </p>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Generate Recipe — SmartRecipe AI{% endblock %}
+
+{% block content %}
+<section class="generate-wrap">
+  <h1>✨ Generate Your Recipe</h1>
+  <p class="page-sub">Tell the AI what you want to cook and what you already have. 🧑‍🍳</p>
+
+  <form method="POST" action="{{ url_for('generate') }}" class="card generate-form" id="generate-form">
+
+    <label for="dish_name">🍽️ Dish</label>
+    <input type="text" id="dish_name" name="dish_name" placeholder="e.g. Chicken Pakodi, Samosa, Paneer Curry..."
+           value="{{ form.dish_name if form else '' }}" required>
+
+    <label for="ingredient_input">🥕 Available Ingredients</label>
+    <div class="chip-input-box" id="chip-box">
+      <div class="chips" id="chip-container"></div>
+      <input type="text" id="ingredient_input" placeholder="Type an ingredient and press Enter ↵">
+    </div>
+    <p class="hint">Example: Chicken, Besan, Onion, Ginger, Garlic, Lemon, Salt, Oil</p>
+    <input type="hidden" name="ingredients" id="ingredients_hidden" value="{{ form.ingredients if form else '' }}">
+
+    <div class="option-list">
+      <label class="toggle-row">
+        <input type="checkbox" name="use_only_available" checked>
+        <span>🔒 Use only my available ingredients</span>
+      </label>
+      <label class="toggle-row">
+        <input type="checkbox" name="suggest_substitutions" checked>
+        <span>🔄 Suggest ingredient substitutions</span>
+      </label>
+      <label class="toggle-row">
+        <input type="checkbox" name="explain_substitutions" checked>
+        <span>💬 Explain substitutions</span>
+      </label>
+    </div>
+
+    <button type="submit" class="btn-solid btn-lg btn-full" id="generate-btn">🤖 Generate Recipe with AI</button>
+
+    <div id="loading-state" class="loading-state hidden">
+      <div class="spinner"></div>
+      <p>🍳 Creating your personalized recipe...</p>
+    </div>
+  </form>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  initIngredientChips('chip-container', 'ingredient_input', 'ingredients_hidden');
+
+  const form = document.getElementById('generate-form');
+  const btn = document.getElementById('generate-btn');
+  const loading = document.getElementById('loading-state');
+
+  form.addEventListener('submit', function (e) {
+    const hidden = document.getElementById('ingredients_hidden').value.trim();
+    if (!hidden) {
+      e.preventDefault();
+      alert('🥕 Please add at least one ingredient.');
+      return;
+    }
+    btn.classList.add('hidden');
+    loading.classList.remove('hidden');
+  });
+</script>
+{% endblock %}

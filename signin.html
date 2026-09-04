@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign In — SmartRecipe AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍲</text></svg>">
+<style>
+
+/* ══════════════════════════════════════════════════════
+   FULL RESET — eliminates every browser default margin
+   that could create the left-edge blank strip
+══════════════════════════════════════════════════════ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;          /* no scrollbars on desktop  */
+  font-family: 'Nunito', sans-serif;
+  background: #FFE8D4;       /* peach — matches image edges */
+}
+
+/* ══════════════════════════════════════════════════════
+   PAGE SHELL — true full-screen, no wrapper padding
+══════════════════════════════════════════════════════ */
+.signin-page {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════════════
+   LEFT PANEL — 54 % of viewport, image anchored LEFT
+   
+   KEY FIX:  object-position: left center
+   ──────────────────────────────────────────────────────
+   The illustration is portrait-oriented.  In a landscape
+   container, "contain" would centre it, leaving a visible
+   gap on BOTH sides.  Anchoring to the left edge means
+   the gap falls on the RIGHT side, where it is invisible
+   because the white right panel overlaps it.
+══════════════════════════════════════════════════════ */
+.signin-left {
+  flex: 0 0 54%;            /* exactly 54 % — no extra columns */
+  height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  background: #FFE8D4;       /* peach — letterbox colour       */
+}
+
+/* ONE image, ONE render, NO duplicate */
+.signin-illustration {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: left center;   /* ← anchors to left viewport edge */
+  display: block;
+  flex-shrink: 0;
+}
+
+/* Thin lavender gradient that bleeds rightward to soften
+   the join between the illustration and the white panel  */
+.left-edge-fade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55px;
+  height: 100%;
+  background: linear-gradient(to right, transparent 0%, #DDD0FF 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* ══════════════════════════════════════════════════════
+   RIGHT PANEL — 46 % of viewport, white, curved left edge
+   The border-radius creates the organic curved divider.
+══════════════════════════════════════════════════════ */
+.signin-right {
+  flex: 1;                   /* takes the remaining 46 %         */
+  height: 100vh;
+  background: #FFFFFF;
+  border-radius: 50px 0 0 50px;  /* the curved divider            */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  overflow-y: auto;          /* allow internal scroll on very small screens */
+  overflow-x: hidden;
+  padding: 20px 52px;
+}
+
+/* ── Decorative lavender circles ── */
+.rc {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(168, 130, 230, 0.09);
+  pointer-events: none;
+}
+.rc1 { width: 160px; height: 160px; top: -50px;   right: -50px;  }
+.rc2 { width: 100px; height: 100px; top: 10px;    right: 60px;   opacity: .6; }
+.rc3 { width: 65px;  height: 65px;  top: 80px;    right: 0;      opacity: .45;}
+.rc4 { width: 120px; height: 120px; bottom: -35px; right: -15px; opacity: .6; }
+.rc5 { width: 70px;  height: 70px;  bottom: 25px;  right: 50px;  opacity: .4; }
+.rcd1 { width: 12px; height: 12px; top: 15%; right: 10%; background: rgba(155,93,229,.18); }
+.rcd2 { width: 8px;  height: 8px;  top: 22%; right: 6%;  background: rgba(155,93,229,.14); }
+.rcd3 { width: 16px; height: 16px; bottom: 18%; right: 6%; background: rgba(155,93,229,.11); }
+
+/* ── Whisk deco ── */
+.right-whisk {
+  position: absolute;
+  right: 10px;
+  top: 42%;
+  opacity: .22;
+  pointer-events: none;
+}
+
+/* ── Leaf deco ── */
+.right-leaf {
+  position: absolute;
+  bottom: 34px;
+  left: 14px;
+  opacity: .45;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════════════
+   FORM CONTENT — compact desktop scale, 500 px max
+══════════════════════════════════════════════════════ */
+.signin-form-wrap {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 2;
+}
+
+/* Key icon — 86px on desktop */
+.key-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+}
+.key-circle {
+  width: 86px;
+  height: 86px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #EDE0FF, #D8C4FF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.1rem;
+  box-shadow: 0 4px 16px rgba(155,93,229,.18);
+}
+.key-sp {
+  position: absolute;
+  color: #9B5DE5;
+  font-style: normal;
+  font-size: .7rem;
+  opacity: .7;
+}
+.ksp1 { top: -1px; right: 54px; }
+.ksp2 { top: -1px; left:  54px; }
+.ksp3 { bottom: 2px; right: 58px; font-size: .55rem; }
+
+/* Titles */
+.card-title {
+  font-size: 2.2rem;          /* ≈ 42px at 1rem = 16px */
+  font-weight: 900;
+  color: #302447;
+  text-align: center;
+  letter-spacing: -.5px;
+  line-height: 1.15;
+  margin-bottom: 6px;
+}
+.card-sub {
+  font-size: .95rem;
+  color: #8C8395;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 24px;
+  line-height: 1.5;
+}
+
+/* Auth form */
+.auth-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.fgroup { margin-bottom: 14px; }
+
+.flabel {
+  display: block;
+  font-size: .85rem;
+  font-weight: 800;
+  color: #302447;
+  margin-bottom: 7px;
+}
+
+.finput-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ficon-l {
+  position: absolute;
+  left: 14px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  color: #C0ADD8;
+}
+.ficon-r {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #C0ADD8;
+}
+
+.auth-form input[type="text"],
+.auth-form input[type="password"] {
+  width: 100%;
+  height: 56px;
+  padding: 0 44px;
+  border: 1.5px solid #DDD0F2;
+  border-radius: 13px;
+  background: #FDFAFF;
+  font-family: 'Nunito', sans-serif;
+  font-size: .92rem;
+  font-weight: 600;
+  color: #302447;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+.auth-form input:focus {
+  border-color: #9B5DE5;
+  box-shadow: 0 0 0 3px rgba(155,93,229,.12);
+}
+.auth-form input::placeholder { color: #C8BBD8; font-weight: 500; }
+
+/* Remember / Forgot */
+.rem-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 4px 0 18px;
+}
+.rem-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  user-select: none;
+  font-size: .84rem;
+  font-weight: 600;
+  color: #6B5F7A;
+}
+.rem-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: #9B5DE5;
+  cursor: pointer;
+}
+.forgot-link {
+  font-size: .84rem;
+  font-weight: 700;
+  color: #9B5DE5;
+  text-decoration: none;
+}
+.forgot-link:hover { text-decoration: underline; }
+
+/* Sign-In button */
+.btn-signin-main {
+  width: 100%;
+  height: 58px;
+  background: linear-gradient(90deg, #B06FEA 0%, #9B5DE5 55%, #8B4AD5 100%);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  box-shadow: 0 5px 20px rgba(155,93,229,.42);
+  transition: transform .18s ease, box-shadow .18s ease;
+  letter-spacing: .1px;
+  margin-bottom: 16px;
+}
+.btn-signin-main:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(155,93,229,.52);
+}
+.btn-signin-main:active { transform: translateY(0); }
+
+/* Auth links */
+.auth-switch {
+  text-align: center;
+  font-size: .86rem;
+  font-weight: 600;
+  color: #8C8395;
+  margin-bottom: 10px;
+}
+.auth-switch a {
+  color: #9B5DE5;
+  font-weight: 800;
+  text-decoration: none;
+}
+.auth-switch a:hover { text-decoration: underline; }
+
+.back-home { text-align: center; }
+.back-home a {
+  font-size: .86rem;
+  font-weight: 700;
+  color: #9B5DE5;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.back-home a:hover { text-decoration: underline; }
+
+/* ── Flash messages ── */
+.flash-overlay {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+}
+.flash {
+  padding: 9px 22px;
+  border-radius: 12px;
+  font-size: .85rem;
+  font-weight: 700;
+  pointer-events: all;
+  white-space: nowrap;
+  transition: opacity .4s ease;
+}
+.flash-error   { background: #FFE5E5; color: #C0392B; border: 1.5px solid #FFBDBD; }
+.flash-success { background: #E5FFE8; color: #27AE60; border: 1.5px solid #C5F5C8; }
+.flash-warning { background: #FFF8E0; color: #B8850A; border: 1.5px solid #FFE499; }
+
+/* ══════════════════════════════════════════════════════
+   RESPONSIVE
+   Desktop (>960 px): landscape two-panel — NO CHANGE
+   Tablet (640-960 px): scale panels proportionally
+   Mobile (<640 px): stack vertically
+══════════════════════════════════════════════════════ */
+@media (max-width: 960px) and (min-width: 640px) {
+  /* Tablet — shrink but keep two-column */
+  .signin-right {
+    padding: 20px 30px;
+    border-radius: 36px 0 0 36px;
+  }
+  .card-title { font-size: 1.7rem; }
+  .key-circle { width: 70px; height: 70px; font-size: 1.75rem; }
+  .auth-form input[type="text"],
+  .auth-form input[type="password"] { height: 50px; font-size: .88rem; }
+  .btn-signin-main { height: 52px; font-size: .95rem; }
+}
+
+@media (max-width: 640px) {
+  html, body { overflow: auto; }
+
+  .signin-page {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  .signin-left {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 44vh;
+    min-height: 240px;
+  }
+
+  .left-edge-fade { display: none; }
+
+  .signin-right {
+    flex: 1;
+    width: 100%;
+    border-radius: 36px 36px 0 0;
+    padding: 32px 20px 44px;
+    overflow-y: auto;
+  }
+
+  .signin-form-wrap { max-width: 100%; }
+  .card-title { font-size: 1.6rem; }
+  .key-circle { width: 68px; height: 68px; font-size: 1.7rem; }
+  .auth-form input[type="text"],
+  .auth-form input[type="password"] { height: 50px; }
+  .btn-signin-main { height: 52px; font-size: .95rem; }
+}
+</style>
+</head>
+<body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-overlay">
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="signin-page">
+
+  <!-- ══════════ LEFT — Single illustration image ══════════
+       The image already contains: logo, heading, subtitle,
+       robot, kitchen scene, recipe board, badge.
+       ONE <img>, no overlays, no duplicates.
+  ══════════════════════════════════════════════════════ -->
+  <div class="signin-left">
+    <img
+      class="signin-illustration"
+      src="{{ url_for('static', filename='signin_illustration.jpg') }}"
+      alt="SmartRecipe AI — AI chef robot cooking in a pastel kitchen"
+    >
+    <!-- Gradient fade that softens the right edge of the image into the white panel -->
+    <div class="left-edge-fade"></div>
+  </div>
+
+  <!-- ══════════ RIGHT — Sign-In panel ══════════ -->
+  <div class="signin-right">
+
+    <!-- Decorative circles -->
+    <div class="rc rc1"></div>
+    <div class="rc rc2"></div>
+    <div class="rc rc3"></div>
+    <div class="rc rc4"></div>
+    <div class="rc rc5"></div>
+    <div class="rc rcd1"></div>
+    <div class="rc rcd2"></div>
+    <div class="rc rcd3"></div>
+
+    <!-- Whisk decoration -->
+    <svg class="right-whisk" width="26" height="62" viewBox="0 0 26 62" fill="none">
+      <rect x="10" y="0" width="6" height="30" rx="3" fill="#CCBBEE"/>
+      <path d="M13 29 C3 39 6 55 13 61" stroke="#CCBBEE" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path d="M13 29 C23 39 20 55 13 61" stroke="#CCBBEE" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path d="M13 29 C7 44 13 56 13 61" stroke="#CCBBEE" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+    </svg>
+
+    <!-- Leaf decoration -->
+    <svg class="right-leaf" width="48" height="72" viewBox="0 0 48 72" fill="none">
+      <ellipse cx="14" cy="34" rx="12" ry="20" fill="#A0D098" transform="rotate(-26 14 34)"/>
+      <ellipse cx="30" cy="27" rx="11" ry="17" fill="#78C070" transform="rotate(17 30 27)"/>
+      <ellipse cx="22" cy="44" rx="9"  ry="15" fill="#60B058" transform="rotate(-7 22 44)"/>
+      <line x1="22" y1="60" x2="22" y2="16" stroke="#50A848" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+
+    <!-- ── Form content ── -->
+    <div class="signin-form-wrap">
+
+      <!-- Key icon -->
+      <div class="key-wrap">
+        <i class="key-sp ksp1">✦</i>
+        <i class="key-sp ksp2">✦</i>
+        <div class="key-circle">🔑</div>
+        <i class="key-sp ksp3">✧</i>
+      </div>
+
+      <h1 class="card-title">Welcome Back</h1>
+      <p class="card-sub">Sign in to continue cooking with AI.</p>
+
+      <form method="POST" action="{{ url_for('signin') }}" class="auth-form">
+
+        <!-- Email / Username -->
+        <div class="fgroup">
+          <label class="flabel" for="identifier">Email or Username</label>
+          <div class="finput-wrap">
+            <span class="ficon-l">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <rect x="2" y="4" width="20" height="16" rx="3"/>
+                <path d="M2 7l10 8 10-8"/>
+              </svg>
+            </span>
+            <input type="text" id="identifier" name="identifier"
+                   placeholder="you@example.com or username"
+                   autocomplete="username" required>
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div class="fgroup">
+          <label class="flabel" for="password">Password</label>
+          <div class="finput-wrap">
+            <span class="ficon-l">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <rect x="3" y="11" width="18" height="11" rx="3"/>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+            </span>
+            <input type="password" id="password" name="password"
+                   placeholder="Your password"
+                   autocomplete="current-password" required>
+            <button type="button" class="ficon-r" onclick="togglePw()"
+                    aria-label="Toggle password visibility">
+              <svg id="eyesvg" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Remember / Forgot -->
+        <div class="rem-row">
+          <label class="rem-label">
+            <input type="checkbox" name="remember">
+            Remember me
+          </label>
+          <a class="forgot-link" href="{{ url_for('home') }}">Forgot Password?</a>
+        </div>
+
+        <!-- Sign In -->
+        <button type="submit" class="btn-signin-main">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+               stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h6v18h-6"/>
+            <path d="M10 17l5-5-5-5"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          Sign In
+        </button>
+
+      </form>
+
+      <p class="auth-switch">Don't have an account? <a href="{{ url_for('signup') }}">📝 Sign Up</a></p>
+      <div class="back-home">
+        <a href="{{ url_for('home') }}">← Back to Home</a>
+      </div>
+
+    </div><!-- /signin-form-wrap -->
+  </div><!-- /signin-right -->
+
+</div><!-- /signin-page -->
+
+<script>
+function togglePw() {
+  const pw  = document.getElementById('password');
+  const svg = document.getElementById('eyesvg');
+  if (pw.type === 'password') {
+    pw.type = 'text';
+    svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    pw.type = 'password';
+    svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+// Auto-hide flash messages
+setTimeout(() => {
+  document.querySelectorAll('.flash').forEach(f => { f.style.opacity = '0'; });
+}, 4000);
+</script>
+</body>
+</html>

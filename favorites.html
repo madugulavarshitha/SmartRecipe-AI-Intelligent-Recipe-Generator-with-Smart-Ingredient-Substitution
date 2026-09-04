@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Favorites — SmartRecipe AI{% endblock %}
+
+{% block content %}
+<section class="history-wrap">
+  <h1>❤️ Favorite Recipes</h1>
+
+  {% if recipes %}
+    <div class="history-grid">
+      {% for r in recipes %}
+        <div class="card history-card">
+          <h3>🍛 {{ r.dish_name }}</h3>
+          <p class="mini-date">📅 {{ r.created_at }}</p>
+          <p class="mini-desc">{{ r.description }}</p>
+          <div class="history-actions">
+            <a href="{{ url_for('recipe_detail', recipe_id=r.id) }}" class="btn-solid btn-sm">👁️ View Recipe</a>
+            <form action="{{ url_for('toggle_favorite', recipe_id=r.id) }}" method="POST">
+              <button type="submit" class="btn-outline btn-sm btn-danger">💔 Remove</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>💛 No favorites yet — save the recipes you love!</p>
+      <a href="{{ url_for('generate') }}" class="btn-solid">✨ Generate Recipe</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

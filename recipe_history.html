@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Recipe History — SmartRecipe AI{% endblock %}
+
+{% block content %}
+<section class="history-wrap">
+  <h1>📜 Recipe History</h1>
+
+  <form method="GET" action="{{ url_for('history') }}" class="search-bar">
+    <input type="text" name="q" placeholder="🔍 Search your recipes..." value="{{ query }}">
+    <button type="submit" class="btn-solid">🔍 Search</button>
+    {% if query %}<a href="{{ url_for('history') }}" class="btn-outline">✖ Clear</a>{% endif %}
+  </form>
+
+  {% if recipes %}
+    <div class="history-grid">
+      {% for r in recipes %}
+        <div class="card history-card">
+          <h3>🍛 {{ r.dish_name }}</h3>
+          <p class="mini-date">📅 Generated: {{ r.created_at }}</p>
+          <p class="mini-desc">{{ r.description }}</p>
+          <div class="history-actions">
+            <a href="{{ url_for('recipe_detail', recipe_id=r.id) }}" class="btn-solid btn-sm">👁️ View Recipe</a>
+            <form action="{{ url_for('toggle_favorite', recipe_id=r.id) }}" method="POST" class="inline-form">
+              <button type="submit" class="btn-outline btn-sm">
+                {% if r.is_favorite %}💔 Unfavorite{% else %}❤️ Favorite{% endif %}
+              </button>
+            </form>
+            <form action="{{ url_for('delete_recipe', recipe_id=r.id) }}" method="POST"
+                  onsubmit="return confirm('Delete this recipe? 🗑️');">
+              <button type="submit" class="btn-outline btn-sm btn-danger">🗑️ Delete</button>
+            </form>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <p>🥣 {% if query %}No recipes matched "{{ query }}".{% else %}You haven't generated any recipes yet.{% endif %}</p>
+      <a href="{{ url_for('generate') }}" class="btn-solid">✨ Generate Recipe</a>
+    </div>
+  {% endif %}
+</section>
+{% endblock %}

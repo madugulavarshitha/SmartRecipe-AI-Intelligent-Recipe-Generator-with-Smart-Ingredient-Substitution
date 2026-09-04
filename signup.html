@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up — SmartRecipe AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍲</text></svg>">
+<style>
+/* ── Reset ───────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Nunito', sans-serif;
+  background: #FFE8D6; /* Peach baseline to match illustration */
+}
+
+/* ── Flash messages ──────────────────────────── */
+.flash-overlay {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+  pointer-events: none;
+}
+.flash {
+  padding: 9px 22px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  pointer-events: all;
+  white-space: nowrap;
+  transition: opacity .4s ease;
+}
+.flash-error   { background: #FFE5E5; color: #C0392B; border: 1.5px solid #FFBDBD; }
+.flash-success { background: #E5FFE8; color: #27AE60; border: 1.5px solid #C5F5C8; }
+.flash-warning { background: #FFF8E0; color: #B8850A; border: 1.5px solid #FFE499; }
+
+/* ── PAGE SHELL ──────────────────────────────── */
+.signup-page {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ══════════════════════════════════════════════
+   LEFT HERO PANEL — 48% Width
+══════════════════════════════════════════════ */
+.signup-left {
+  flex: 0 0 48%;
+  height: 100vh;
+  position: relative;
+  background: linear-gradient(150deg, #FFF7F0 0%, #FFE6D6 60%, #FFD8C0 100%);
+  overflow: hidden;
+}
+
+/* Logo placement: top 42px, left 55px */
+.signup-logo {
+  position: absolute;
+  top: 42px;
+  left: 55px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  z-index: 20;
+}
+.logo-text {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #211A4A;
+  letter-spacing: -0.2px;
+  line-height: 1;
+}
+.logo-text .ai { color: #8B4DE8; }
+
+/* Dedicated Hero Text Container */
+.hero-copy {
+  position: absolute;
+  left: 55px;
+  top: 135px;
+  width: 430px;
+  z-index: 10;
+}
+.signup-h1 {
+  font-size: 48px; /* Target range: 48-54px */
+  font-weight: 800;
+  color: #211A4A;
+  line-height: 1.05;
+  letter-spacing: -1.2px;
+  margin-bottom: 12px;
+}
+.h1-heart {
+  color: #F08FBC;
+  font-style: normal;
+}
+.signup-desc {
+  font-size: 17px; /* Target range: 17-18px */
+  color: #555071;
+  font-weight: 600;
+  line-height: 1.65;
+}
+
+/* Cooking Image Container: lower portion */
+.signup-illustration-container {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 59%; /* Target range: 58-62% */
+  z-index: 5;
+  overflow: hidden;
+}
+.signup-illustration {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center bottom;
+  display: block;
+}
+
+/* AI-Powered Recipes Badge */
+.ai-badge {
+  position: absolute;
+  bottom: 38px;
+  left: 45px;
+  z-index: 20;
+  background: #FFFFFF;
+  border-radius: 60px;
+  padding: 12px 20px 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 6px 28px rgba(130, 80, 200, 0.12);
+  width: 350px;
+  height: 88px; /* Target range: 80-95px */
+}
+.ai-badge-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #DCC4FF, #C9A4FF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+}
+.ai-badge-copy { display: flex; flex-direction: column; gap: 1px; }
+.ai-badge-title { font-size: 0.88rem; font-weight: 900; color: #8B4DE8; }
+.ai-badge-sub { font-size: 0.72rem; font-weight: 600; color: #6F6784; }
+
+/* ══════════════════════════════════════════════
+   CURVED DIVIDER — SVG Overlay at 48% boundary
+══════════════════════════════════════════════ */
+.curve-svg {
+  position: absolute;
+  top: 0;
+  left: -49px;
+  width: 50px;
+  height: 100%;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════════
+   RIGHT SIGN-UP PANEL — 52% Width
+══════════════════════════════════════════════ */
+.signup-right {
+  flex: 1;
+  height: 100vh;
+  background: linear-gradient(135deg, #F8F2FF 0%, #F1E8FF 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 10;
+  padding: 20px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Background circles decoration */
+.rc {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(139, 77, 232, 0.07);
+  pointer-events: none;
+}
+.rc1 { width: 180px; height: 180px; top: -50px; right: -50px; }
+.rc2 { width: 110px; height: 110px; top: 20px; right: 80px; opacity: 0.6; }
+.rc3 { width: 70px; height: 70px; bottom: 40px; right: 50px; opacity: 0.5; }
+.rc4 { width: 140px; height: 140px; bottom: -40px; left: -20px; opacity: 0.6; }
+
+.signup-card {
+  width: 620px;
+  max-width: calc(100% - 90px);
+  height: auto;
+  background: #FFFFFF;
+  border-radius: 30px;
+  box-shadow: 0 10px 40px rgba(139, 77, 232, 0.08);
+  padding: 34px 54px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 2;
+  position: relative;
+}
+
+/* Account Icon: 80px circle */
+.account-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+.account-circle {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: #F1E8FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #8B4DE8;
+  position: relative;
+}
+.account-plus {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 22px;
+  height: 22px;
+  background: #8B4DE8;
+  border-radius: 50%;
+  border: 2px solid #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #FFFFFF;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+.ac-sp {
+  position: absolute;
+  color: #8B4DE8;
+  font-style: normal;
+  font-size: 0.8rem;
+  opacity: 0.8;
+}
+.asp1 { top: 4px; right: -18px; }
+.asp2 { bottom: 12px; left: -20px; }
+
+/* Typography */
+.signup-title {
+  font-size: 36px; /* Target range: 34-38px */
+  font-weight: 800;
+  color: #211A4A;
+  text-align: center;
+  letter-spacing: -0.5px;
+  margin-bottom: 4px;
+}
+.signup-subtitle {
+  font-size: 16px; /* Target range: 16-17px */
+  color: #817896;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* Form structure */
+.signup-form {
+  width: 100%;
+  max-width: 540px; /* Target form width */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Row wrapper for side-by-side inputs */
+.form-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+.form-row .fgroup {
+  flex: 1;
+}
+
+.fgroup {
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.flabel {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #211A4A;
+  margin-bottom: 5px;
+}
+
+.finput-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.ficon-l {
+  position: absolute;
+  left: 14px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  color: #C0ADD8;
+}
+.ficon-r {
+  position: absolute;
+  right: 12px;
+  display: flex;
+  align-items: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #C0ADD8;
+}
+
+.signup-form input[type="text"],
+.signup-form input[type="email"],
+.signup-form input[type="password"] {
+  width: 100%;
+  height: 52px; /* Target input height */
+  padding: 0 42px;
+  border: 1.5px solid #F1E8FF;
+  border-radius: 12px;
+  background: #FDFAFF;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #211A4A;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.signup-form input:focus {
+  border-color: #8B4DE8;
+  box-shadow: 0 0 0 3px rgba(139, 77, 232, 0.12);
+  background: #FFFFFF;
+}
+.signup-form input::placeholder {
+  color: #C0ADD8;
+  font-weight: 500;
+}
+
+/* Password requirements */
+.pw-guidance {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  color: #817896;
+  font-weight: 600;
+  margin-top: 1px;
+  margin-bottom: 16px;
+}
+.pw-guidance svg {
+  color: #B9DFAE;
+  flex-shrink: 0;
+}
+
+/* Submit button: 56px height, 28px rounded */
+.btn-signup-submit {
+  width: 100%;
+  height: 56px;
+  background: linear-gradient(90deg, #9B5DE5 0%, #7D3FE0 100%);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 28px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 5px 18px rgba(139, 77, 232, 0.35);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  margin-bottom: 14px;
+}
+.btn-signup-submit:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 8px 22px rgba(139, 77, 232, 0.45);
+}
+.btn-signup-submit:active {
+  transform: translateY(0);
+}
+
+/* Social Login Divider */
+.social-divider {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 14px;
+}
+.social-divider::before, .social-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #F1E8FF;
+}
+.social-divider span {
+  padding: 0 12px;
+  font-size: 0.78rem;
+  color: #817896;
+  font-weight: 600;
+}
+
+/* Social Buttons row: 50-52px height */
+.social-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 18px;
+}
+.btn-social {
+  flex: 1;
+  height: 50px;
+  background: #FFFFFF;
+  border: 1.5px solid #F1E8FF;
+  border-radius: 12px;
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #211A4A;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s, border-color 0.2s;
+}
+.btn-social:hover {
+  background: #FDFAFF;
+  border-color: #DCC4FF;
+}
+
+/* Secondary switch links */
+.auth-switch {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #817896;
+  margin-bottom: 10px;
+  text-align: center;
+}
+.auth-switch a {
+  color: #8B4DE8;
+  font-weight: 800;
+  text-decoration: none;
+}
+.auth-switch a:hover {
+  text-decoration: underline;
+}
+
+.back-home { text-align: center; }
+.back-home a {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #8B4DE8;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.back-home a:hover {
+  text-decoration: underline;
+}
+
+/* ── Responsive & Spacing Tweaks for Shorter Screens ── */
+@media (max-height: 850px) {
+  .hero-copy {
+    top: 95px;
+  }
+  .signup-h1 {
+    font-size: 38px;
+    margin-bottom: 8px;
+  }
+  .signup-desc {
+    font-size: 15px;
+  }
+  .signup-illustration-container {
+    height: 54%;
+  }
+  .signup-card {
+    padding: 24px 36px;
+  }
+  .signup-title {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 1024px) {
+  html, body { overflow: auto; }
+  .signup-page {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    overflow: auto;
+  }
+  .signup-left {
+    flex: 0 0 auto;
+    width: 100%;
+    height: 40vh;
+    min-height: 280px;
+    padding: 30px;
+  }
+  .hero-copy {
+    position: static;
+    width: 100%;
+    margin-top: 60px;
+  }
+  .signup-illustration-container {
+    height: 45%;
+  }
+  .curve-svg { display: none; }
+  .signup-right {
+    flex: 1;
+    width: 100%;
+    padding: 30px 20px;
+    overflow: visible;
+  }
+  .signup-card {
+    max-width: 100%;
+    padding: 24px;
+  }
+  .ai-badge { display: none; }
+}
+
+@media (max-width: 560px) {
+  .signup-left { height: 32vh; min-height: 220px; }
+  .signup-h1 { font-size: 1.8rem; }
+  .signup-card { border-radius: 20px; }
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  .social-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .btn-social { height: 44px; }
+}
+</style>
+</head>
+<body>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-overlay">
+      {% for cat, msg in messages %}
+        <div class="flash flash-{{ cat }}">{{ msg }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<div class="signup-page">
+
+  <!-- ══════════ LEFT — Branding & Cooking Illustration ══════════ -->
+  <div class="signup-left">
+    
+    <!-- Logo -->
+    <a href="{{ url_for('home') }}" class="signup-logo">
+      <svg width="36" height="36" viewBox="0 0 40 40" fill="none">
+        <circle cx="14" cy="12" r="6" fill="#FFFFFF" stroke="#8B4DE8" stroke-width="1.8"/>
+        <circle cx="26" cy="12" r="6" fill="#FFFFFF" stroke="#8B4DE8" stroke-width="1.8"/>
+        <circle cx="20" cy="10" r="7" fill="#FFFFFF" stroke="#8B4DE8" stroke-width="1.8"/>
+        <rect x="9" y="16" width="22" height="5" rx="1.5" fill="#8B4DE8"/>
+        <rect x="10" y="20" width="20" height="15" rx="6" fill="#8B4DE8"/>
+        <circle cx="15.5" cy="26" r="2" fill="white"/>
+        <circle cx="24.5" cy="26" r="2" fill="white"/>
+        <path d="M17 31 Q20 33.5 23 31" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <circle cx="8" cy="25" r="3.5" fill="#FFF4EA" stroke="#8B4DE8" stroke-width="1.6"/>
+        <circle cx="32" cy="25" r="3.5" fill="#FFF4EA" stroke="#8B4DE8" stroke-width="1.6"/>
+      </svg>
+      <span class="logo-text">SmartRecipe <span class="ai">AI</span></span>
+    </a>
+
+    <!-- Dedicated Hero Text area (starts at top 135px, left 55px) -->
+    <div class="hero-copy">
+      <h1 class="signup-h1">Cook Smarter,<br>Live Better <i class="h1-heart">♡</i></h1>
+      <p class="signup-desc">Create personalized recipes, discover new flavors, and enjoy cooking like never before with AI.</p>
+    </div>
+
+    <!-- Main illustration occupies lower 59% -->
+    <div class="signup-illustration-container">
+      <img class="signup-illustration" src="{{ url_for('static', filename='signup_illustration.jpg') }}" alt="SmartRecipe AI Cooking Pot">
+    </div>
+
+    <!-- AI badge -->
+    <div class="ai-badge">
+      <div class="ai-badge-circle">✨</div>
+      <div class="ai-badge-copy">
+        <span class="ai-badge-title">AI-Powered Recipes</span>
+        <span class="ai-badge-sub">Made with the ingredients you love</span>
+      </div>
+    </div>
+
+  </div>
+  <!-- ════════ END LEFT ════════ -->
+
+  <!-- ══════════ RIGHT — Sign-Up Form ══════════ -->
+  <div class="signup-right">
+    
+    <!-- Curved separator lines overlapping left panel -->
+    <svg class="curve-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+      <path d="M100 0 C 15 30 15 70 100 100 L 100 100 L 100 0 Z" fill="#F8F2FF" />
+      <path d="M100 0 C 15 30 15 70 100 100" fill="none" stroke="#C9A4FF" stroke-width="1.5" />
+    </svg>
+
+    <!-- Circles decoration -->
+    <div class="rc rc1"></div>
+    <div class="rc rc2"></div>
+    <div class="rc rc3"></div>
+    <div class="rc rc4"></div>
+
+    <!-- Content Card -->
+    <div class="signup-card">
+      
+      <!-- Account plus badge -->
+      <div class="account-icon-wrap">
+        <i class="ac-sp asp1">✦</i>
+        <div class="account-circle">
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+          <div class="account-plus">+</div>
+        </div>
+        <i class="ac-sp asp2">✧</i>
+      </div>
+
+      <h2 class="signup-title">Create Your Account</h2>
+      <p class="signup-subtitle">Join SmartRecipe AI and start your delicious journey.</p>
+
+      <form method="POST" action="{{ url_for('signup') }}" class="signup-form" id="signupForm">
+        
+        <!-- Hidden database fields filled on submit -->
+        <input type="hidden" name="full_name" id="full_name">
+        <input type="hidden" name="username" id="username">
+
+        <!-- Row 1: Name fields -->
+        <div class="form-row">
+          <div class="fgroup">
+            <label class="flabel" for="first_name">First Name</label>
+            <div class="finput-wrap">
+              <span class="ficon-l">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </span>
+              <input type="text" id="first_name" placeholder="First name" required>
+            </div>
+          </div>
+          <div class="fgroup">
+            <label class="flabel" for="last_name">Last Name</label>
+            <div class="finput-wrap">
+              <span class="ficon-l">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+              </span>
+              <input type="text" id="last_name" placeholder="Last name" required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Row 2: Email -->
+        <div class="fgroup">
+          <label class="flabel" for="email">Email Address</label>
+          <div class="finput-wrap">
+            <span class="ficon-l">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="4" width="20" height="16" rx="3"/>
+                <path d="M2 7l10 8 10-8"/>
+              </svg>
+            </span>
+            <input type="email" id="email" name="email" placeholder="you@example.com" required>
+          </div>
+        </div>
+
+        <!-- Row 3: Passwords -->
+        <div class="form-row">
+          <div class="fgroup">
+            <label class="flabel" for="password">Password</label>
+            <div class="finput-wrap">
+              <span class="ficon-l">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="3"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </span>
+              <input type="password" id="password" name="password" placeholder="Create password" required>
+              <button type="button" class="ficon-r" onclick="togglePw('password', this)" aria-label="Toggle password visibility">
+                <svg class="eyesvg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="fgroup">
+            <label class="flabel" for="confirm_password">Confirm Password</label>
+            <div class="finput-wrap">
+              <span class="ficon-l">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="11" width="18" height="11" rx="3"/>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+              </span>
+              <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+              <button type="button" class="ficon-r" onclick="togglePw('confirm_password', this)" aria-label="Toggle password visibility">
+                <svg class="eyesvg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Password guidance -->
+        <div class="pw-guidance">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="m9 11 2 2 4-4"/>
+          </svg>
+          Use 8+ characters with a mix of letters, numbers & symbols.
+        </div>
+
+        <!-- Submit button -->
+        <button type="submit" class="btn-signup-submit">
+          ✦ Create Account
+        </button>
+
+      </form>
+
+      <!-- Social continuation divider -->
+      <div class="social-divider">
+        <span>or continue with</span>
+      </div>
+
+      <!-- Social Row -->
+      <div class="social-row">
+        <button class="btn-social">
+          <svg width="16" height="16" viewBox="0 0 24 24">
+            <path fill="#EA4335" d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.6 14.98 1 12 1 7.35 1 3.37 3.68 1.4 7.6l3.87 3C6.18 7.6 8.85 5.04 12 5.04z"/>
+            <path fill="#4285F4" d="M23.5 12.25c0-.82-.07-1.61-.21-2.38H12v4.51h6.47c-.28 1.48-1.12 2.73-2.38 3.58l3.69 2.87c2.16-2 3.72-4.94 3.72-8.58z"/>
+            <path fill="#FBBC05" d="M5.27 14.6c-.24-.72-.38-1.5-.38-2.3s.14-1.58.38-2.3L1.4 7c-.8 1.6-1.25 3.4-1.25 5.3s.45 3.7 1.25 5.3l3.87-3z"/>
+            <path fill="#34A853" d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.69-2.87c-1.02.68-2.33 1.09-3.96 1.09-3.15 0-5.82-2.56-6.77-5.56L1.67 15.7C3.64 19.62 7.62 23 12 23z"/>
+          </svg>
+          Google
+        </button>
+        <button class="btn-social">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-3.477-10-10-10z"/>
+          </svg>
+          Facebook
+        </button>
+        <button class="btn-social">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.17c.66-.81 1.11-1.93.99-3.06-1 .04-2.21.67-2.93 1.49-.62.69-1.16 1.84-1.01 2.96 1.12.09 2.27-.57 2.95-1.39Z"/>
+          </svg>
+          Apple
+        </button>
+      </div>
+
+      <p class="auth-switch">Already have an account? <a href="{{ url_for('signin') }}">Sign In</a></p>
+      <div class="back-home">
+        <a href="{{ url_for('home') }}">← Back to Home</a>
+      </div>
+
+    </div>
+  </div>
+  <!-- ════════ END RIGHT ════════ -->
+
+</div>
+
+<script>
+// Toggle Password function
+function togglePw(fieldId, btnEl) {
+  const input = document.getElementById(fieldId);
+  const svg = btnEl.querySelector('.eyesvg');
+  if (input.type === 'password') {
+    input.type = 'text';
+    svg.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    input.type = 'password';
+    svg.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+// Auto-populate hidden database fields on form submission
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+  const firstName = document.getElementById('first_name').value.trim();
+  const lastName = document.getElementById('last_name').value.trim();
+  const email = document.getElementById('email').value.trim();
+
+  // full_name = "First Name Last Name"
+  document.getElementById('full_name').value = (firstName + " " + lastName).trim();
+
+  // username generation (unique, lowercase alphanumeric + suffix)
+  let computedUsername = (firstName + lastName).toLowerCase().replace(/[^a-z0-9]/g, '');
+  if (!computedUsername) {
+    computedUsername = email.split('@')[0].replace(/[^a-z0-9]/g, '');
+  }
+  const randomSuffix = Math.floor(100 + Math.random() * 900);
+  document.getElementById('username').value = computedUsername + randomSuffix;
+});
+
+// Auto-hide flash messages
+setTimeout(() => {
+  document.querySelectorAll('.flash').forEach(f => {
+    f.style.transition = 'opacity .5s ease';
+    f.style.opacity = '0';
+  });
+}, 4000);
+</script>
+</body>
+</html>
